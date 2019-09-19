@@ -1,0 +1,6 @@
+
+; append list
+(append '(pat kim) '(Robin sanday))
+
+; => (PAT KIM ROBIN SANDAY)
+
