@@ -1,5 +1,7 @@
 use rand::Rng;
-
+#[macro_use]
+extern crate lazy_static;
+extern crate gensym;
 
 /*
 (defparameter *simple-grammer*
@@ -12,49 +14,72 @@ use rand::Rng;
   "A grammar for a trivial subset of English")
 */
 
-static ARTICLE_TABLE:[&str; 2] = ["a", "the"];
-static NOUN_TABLE:[&str; 4] = ["man", "ball", "woman", "table"];
-static VERB_TABLE:[&str; 4] = ["hit", "took", "saw", "liked"];
 
 fn random_elm_idx(i:usize) -> usize {
     let mut rng =  rand::thread_rng();
     rng.gen_range(0, i as u32) as usize
 }
 
+macro_rules! _simple_rule {
+    ($gensym:ident, $e1: ident, $e11:tt, $e2: expr) => {
+        lazy_static! {
+            static ref $gensym:Vec<&'static str> = {
+                let mut table:Vec<&'static str> = Vec::new();
+                for s in $e2.split(' ') {
+                    table.push(s);
+                }
+                table
+            };
+        }
+
+        fn $e1()-> Vec<&'static str>  {
+            vec![$gensym[random_elm_idx($gensym.len())]]
+        }
+    }
+}
+
 macro_rules! simple_rule {
-    ($e1: ident, $e2: expr) => {
-        fn $e1() -> &'static str {
-            $e2[random_elm_idx($e2.len())]
+    ($e1: ident, $e11:tt, $e2: expr) => {
+        gensym::gensym! {
+          _simple_rule!{ $e1, $e11, $e2}
         }
     };
 }
 
-simple_rule!(article, ARTICLE_TABLE);
-simple_rule!(noun, NOUN_TABLE);
-simple_rule!(verb, VERB_TABLE);
-
-
-fn noun_phrase() -> Vec<&'static str> {
-    let art = article();
-    let no = noun();
-    vec![art, no]
+macro_rules! composite_rule {
+    ($e1: ident, $e_dummy:tt, $e2: expr, $e3: expr) => {
+        fn $e1() -> Vec<&'static str> {
+            let mut n:Vec<&str> = Vec::new();
+            for s in $e2() {
+                n.push(s);
+            }
+            for s in $e3() {
+                n.push(s);
+            }
+            n
+        }
+    };
 }
 
+
+
+composite_rule!(noun_phrase, =>, article, noun);
+composite_rule!(verb_phrase, =>, verb, noun_phrase);
+composite_rule!(sentence,    =>, noun_phrase, verb_phrase);
+simple_rule!(article, =>, "a the");
+simple_rule!(noun,    =>, "man ball woman table");
+simple_rule!(verb,    =>, "hit took saw liked");
+
 fn conv_str(v:Vec<&'static str>) -> String {
-
-
-
-    "".to_string()
+    let mut cs:String = "".to_string();
+    for s in v {
+        cs = cs + s + " ";
+    }
+    cs + "."
 }
 
 fn main() {
-    let gen_art = article();
-    let gen_noun = noun();
-    let gen_verb = verb();
-
-    println!("{} {} {} ", gen_art, gen_noun, gen_verb);
-
-    let gen_noun_pharse = noun_phrase();
-    println!("{}", gen_noun_pharse);
-
+    for _ in 1..10  {
+        println!("{}", conv_str(sentence()));
+    }
 }
