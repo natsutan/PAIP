@@ -21,7 +21,7 @@ fn random_elm_idx(i:usize) -> usize {
     rng.gen_range(0, i as u32) as usize
 }
 
-macro_rules! simple_sel {
+macro_rules! simple_rule {
     ($e1: ident, $e2: expr) => {
         fn $e1() -> &'static str {
             $e2[random_elm_idx($e2.len())]
@@ -29,10 +29,11 @@ macro_rules! simple_sel {
     };
 }
 
-simple_sel!(article, ARTICLE_TABLE);
-simple_sel!(noun, NOUN_TABLE);
-simple_sel!(verb, VERB_TABLE);
+simple_rule!(article, ARTICLE_TABLE);
+simple_rule!(noun, NOUN_TABLE);
+simple_rule!(verb, VERB_TABLE);
 
+S
 fn noun_phrase() -> Vec<&'static str> {
     let art = article();
     let no = noun();
@@ -40,7 +41,7 @@ fn noun_phrase() -> Vec<&'static str> {
 }
 
 fn conv_str(v:Vec<&'static str>) -> String {
-    
+
 
 
     "".to_string()
