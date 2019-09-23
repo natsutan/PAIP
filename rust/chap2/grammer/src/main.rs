@@ -21,20 +21,30 @@ fn random_elm_idx(i:usize) -> usize {
     rng.gen_range(0, i as u32) as usize
 }
 
-fn article() -> &'static str {
-    ARTICLE_TABLE[random_elm_idx(ARTICLE_TABLE.len())]
+macro_rules! simple_sel {
+    ($e1: ident, $e2: expr) => {
+        fn $e1() -> &'static str {
+            $e2[random_elm_idx($e2.len())]
+        }
+    };
 }
 
-fn noun() -> &'static str {
-    let idx = random_elm_idx(NOUN_TABLE.len());
-    NOUN_TABLE[idx]
+simple_sel!(article, ARTICLE_TABLE);
+simple_sel!(noun, NOUN_TABLE);
+simple_sel!(verb, VERB_TABLE);
+
+fn noun_phrase() -> Vec<&'static str> {
+    let art = article();
+    let no = noun();
+    vec![art, no]
 }
 
-fn verb() -> &'static str {
-    let idx = random_elm_idx(VERB_TABLE.len());
-    VERB_TABLE[idx]
-}
+fn conv_str(v:Vec<&'static str>) -> String {
+    
 
+
+    "".to_string()
+}
 
 fn main() {
     let gen_art = article();
@@ -42,4 +52,8 @@ fn main() {
     let gen_verb = verb();
 
     println!("{} {} {} ", gen_art, gen_noun, gen_verb);
+
+    let gen_noun_pharse = noun_phrase();
+    println!("{}", gen_noun_pharse);
+
 }
