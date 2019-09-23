@@ -33,7 +33,7 @@ simple_rule!(article, ARTICLE_TABLE);
 simple_rule!(noun, NOUN_TABLE);
 simple_rule!(verb, VERB_TABLE);
 
-S
+
 fn noun_phrase() -> Vec<&'static str> {
     let art = article();
     let no = noun();
