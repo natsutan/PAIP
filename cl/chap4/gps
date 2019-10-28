@@ -1,0 +1,20 @@
+(defvar *state* nil
+  "the current state: a list of condtions")
+
+(defvar *ops* nil
+  "A list of available operators.")
+
+(defstruct op
+  "An operation"
+  (action nil)
+  (precond nil)
+  (all-list nil)
+  (del-list nil))
+
+(defun GPS (*state* goal *ops*)
+  "General Problem Solver: archive all goals using *ops*"
+  (if (every #'achieve goals) 'solved))
+
+(defun achieve (goal)
+  "A goal is achieved if it already holds, or if there is an appropriate op for it that applicable"
+  
