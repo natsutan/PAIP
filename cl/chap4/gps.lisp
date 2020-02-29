@@ -1,3 +1,5 @@
+(load "C:\\home\\myproj\\PAIP\\cl\\common\\paip.lisp")
+
 (defvar *state* nil
   "the current state: a list of condtions")
 
@@ -7,8 +9,8 @@
 (defstruct op
   "An operation"
   (action nil)
-  (precond nil)
-  (all-list nil)
+  (preconds nil)
+  (add-list nil)
   (del-list nil))
 
 (defun GPS (*state* goal *ops*)
@@ -28,5 +30,8 @@
   "Print a message and updat *state* is op is applicable. "
   (when (every #'achieve (op-preconds op))
     (print (list 'executing (op-action op)))
-    (setf *state*
+    (setf *state* (set-difference *state* (op-del-list op)))
+    (setf *state* (union *state* (op-add-list op)))
+    t))
+
 

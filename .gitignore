@@ -1,2 +1,5 @@
 
 cl/chap2/*.lsp~
+cl/chap4/gps.lisp~
+cl/chap4/gps.ofasl
+cl/common/paip.lisp~
