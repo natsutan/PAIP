@@ -1,6 +1,8 @@
 
 cl/chap2/*.lsp~
-cl/chap4/gps.lisp~
-cl/chap4/gps.ofasl
-cl/common/paip.lisp~
-cl/common/#paip.lisp#
+cl/chap4/*.lisp~
+cl/chap4/*.ofasl
+cl/common/*.lisp~
+cl/common/*.lisp#
+*.lisp~
+cl/chap4/#gps2.lisp#
