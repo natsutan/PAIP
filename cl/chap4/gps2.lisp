@@ -44,7 +44,7 @@
 
 (defun convert-op (op)
   (unless (some #'executing-p (op-add-list op))
-    (push (list #'executing  (op-action op)) (op-add-list op)))
+    (push (list 'executing  (op-action op)) (op-add-list op)))
   op)
 
 (defun op (action &key preconds add-list del-list)
@@ -105,8 +105,8 @@
   (length (setf *ops* oplist)))
 
 (load "C:\\home\\myproj\\PAIP\\cl\\chap4\\school.lisp")
-;(mapc #'convert-op *school-ops*)
-(use *school-ops*)
+(use (mapc #'convert-op *school-ops*))
+;(use *school-ops*)
 
 (gps '(son-at-home car-needs-battery have-money have-phone-book)
      '(son-at-school))
