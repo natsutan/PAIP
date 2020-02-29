@@ -17,11 +17,11 @@
   (setf *dbg-ids* (if (null ids) nil
                       (set-difference *dbg-ids* ids))))
 
-(defun dbg-indent (id indent format-strng &rest args)
+(defun dbg-indent (id indent format-string &rest args)
   "Print indentd debugging info if (DEBUG ID) has been specified"
   (when (member id *dbg-ids*) 
     (fresh-line *debug-io*)
-    (dotimes (i indent) (princ " "*debug-io*))
+    (dotimes (i indent) (princ " " *debug-io*))
     (apply #'format *debug-io* format-string args)))
 
 
@@ -74,7 +74,7 @@
 
 (defun achieve (state goal goal-stack)
   "A goal is achieed if it that is applicable"
-  (dbg-indent :gps (length goal-stack) state)
+  (dbg-indent :gps (length goal-stack) "Goal:~a" goal)
   (cond ((member-equal goal state) state)
         ((member-equal goal goal-stack) nil)
         (t (some #'(lambda (op) (apply-op state goal op goal-stack))
