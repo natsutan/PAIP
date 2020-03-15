@@ -82,12 +82,50 @@ fn school_ops() -> Vec<Op> {
     ops
 }
 
+#[warn(dead_code)]
+fn appropriate(goal:&Condition, op:Op) -> bool {
+    op.add_list.contains(&goal)
+}
+
+
+#[warn(unused_variables)]
+fn apply_op(mut _state:&Vec<Condition>, _goal:&Condition, _op:&Op) -> bool {
+    true
+}
+
+#[warn(unused_variables)]
+fn archive(mut state:&Vec<Condition>, goal:&Condition, ops:&Vec<Op>) -> bool {
+    if state.contains(&goal) {
+        return true;
+    }
+    for op in ops {
+        if apply_op(&state, goal, op) {
+            return true;
+        }
+    }
+    false
+}
+
+
+fn gps(mut state:Vec<Condition>, goals:Vec<Condition>, ops:Vec<Op>) -> bool {
+
+    for goal in &goals {
+        if !archive(&state, &goal, &ops) {
+            return false
+        }
+    }
+    true
+}
 
 
 fn main() {
 
     let ops = school_ops();
+    //let mut state:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarNeedsBattery, Condition::HaveMoney, Condition::HavePhoneBook];
+    let mut problem1:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarWorks];
 
+    let goal :Vec<Condition> = vec![Condition::SonAtSchool];
 
-    println!("{:?}", ops);
+    let result = gps(problem1, goal, ops);
+    println!("{:?}", result);
 }
