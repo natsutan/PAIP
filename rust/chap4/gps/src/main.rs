@@ -100,45 +100,64 @@ fn school_ops() -> Vec<Op> {
     ops
 }
 
-#[warn(dead_code)]
 fn appropriate(goal:&Condition, op:&Op) -> bool {
     op.add_list.contains(&goal)
 }
 
 
 #[warn(unused_variables)]
-fn apply_op(mut _state:&Vec<Condition>, _goal:&Condition, _op:& Op) -> bool {
+fn apply_op(state:&mut Vec<Condition>, _goal:&Condition, ops:&Vec<Op>) -> bool {
+
+    let the_op = &ops[0];
+    for goal in &the_op.precond {
+        if archive(state, &goal, &ops) {
+            println!("Executing:{:?}", &the_op.action);
+            //update state
+            //dellistにあるステートを削除
+            for del_state in &the_op.del_list {
+                state.retain(|st| *st != *del_state);
+            }
+
+            //addlistにあるステートを追加
+            for add_state in &the_op.add_list {
+                if !state.contains(add_state) {
+                    state.push(add_state.clone());
+                }
+            }
+
+            return true
+        }
+    }
     false
 }
 
-#[warn(unused_variables)]
-fn archive(mut state:&Vec<Condition>, goal:&Condition, ops:&Vec<Op>) -> bool {
+fn archive(state:&mut Vec<Condition>, goal:&Condition, ops:&Vec<Op>) -> bool {
     if state.contains(&goal) {
         return true;
     }
+    // appropriateを使って、使えるOPを取り出す。
+   let mut appropriate_ops :Vec<Op> = vec![];
     for op in ops {
-        // appropriateを使って、使えるOPを取り出す。
-       let mut appropriate_ops :Vec<Op> = vec![];
-        for op in ops {
-            if appropriate(goal, op) {
-                appropriate_ops.push(op.clone());
-            }
-        }
-
-        for op in appropriate_ops {
-            if apply_op(&state, goal, &op) {
-                return true;
-            }
+        if appropriate(goal, op) {
+            appropriate_ops.push(op.clone());
         }
     }
+
+    for op in appropriate_ops {
+        let op_v = vec![op];
+        if apply_op(state, goal, &op_v) {
+            return true;
+        }
+    }
+
     false
 }
 
 
-fn gps(mut state:Vec<Condition>, goals:Vec<Condition>, ops:Vec<Op>) -> bool {
+fn gps(state:&mut Vec<Condition>, goals:Vec<Condition>, ops:Vec<Op>) -> bool {
 
     for goal in &goals {
-        if !archive(&state, &goal, &ops) {
+        if !archive(state, &goal, &ops) {
             return false
         }
     }
@@ -149,12 +168,14 @@ fn gps(mut state:Vec<Condition>, goals:Vec<Condition>, ops:Vec<Op>) -> bool {
 fn main() {
 
     let ops = school_ops();
-    //let mut state:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarNeedsBattery, Condition::HaveMoney, Condition::HavePhoneBook];
-    let mut problem1:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarWorks];
+    let mut state:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarNeedsBattery, Condition::HaveMoney, Condition::HavePhoneBook];
+    //let mut problem1:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarWorks];
 
     let goal :Vec<Condition> = vec![Condition::SonAtSchool];
 
 
-    let result = gps(problem1, goal, ops);
+    let result = gps(&mut state, goal, ops);
+
     println!("{:?}", result);
+    println!("{:?}", state);
 }
