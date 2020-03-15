@@ -1,3 +1,4 @@
+use crate::Condition::CarWorks;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum Action {
@@ -109,29 +110,30 @@ fn appropriate(goal:&Condition, op:&Op) -> bool {
 fn apply_op(state:&mut Vec<Condition>, _goal:&Condition, ops:&Vec<Op>) -> bool {
 
     let the_op = &ops[0];
+    println!("apply_op {:?}", the_op);
     for goal in &the_op.precond {
-        if archive(state, &goal, &ops) {
-            println!("Executing:{:?}", &the_op.action);
-            //update state
-            //dellistにあるステートを削除
-            for del_state in &the_op.del_list {
-                state.retain(|st| *st != *del_state);
-            }
-
-            //addlistにあるステートを追加
-            for add_state in &the_op.add_list {
-                if !state.contains(add_state) {
-                    state.push(add_state.clone());
-                }
-            }
-
-            return true
+        if !archive(state, &goal, &ops) {
+            return false
         }
     }
-    false
+    println!("Executing:{:?}", &the_op.action);
+    //update state
+    //dellistにあるステートを削除
+    for del_state in &the_op.del_list {
+        state.retain(|st| *st != *del_state);
+    }
+
+    //addlistにあるステートを追加
+    for add_state in &the_op.add_list {
+        if !state.contains(add_state) {
+            state.push(add_state.clone());
+        }
+    }
+    return true
 }
 
 fn archive(state:&mut Vec<Condition>, goal:&Condition, ops:&Vec<Op>) -> bool {
+    println!("archive {:?}", goal);
     if state.contains(&goal) {
         return true;
     }
@@ -142,6 +144,7 @@ fn archive(state:&mut Vec<Condition>, goal:&Condition, ops:&Vec<Op>) -> bool {
             appropriate_ops.push(op.clone());
         }
     }
+
 
     for op in appropriate_ops {
         let op_v = vec![op];
@@ -168,8 +171,9 @@ fn gps(state:&mut Vec<Condition>, goals:Vec<Condition>, ops:Vec<Op>) -> bool {
 fn main() {
 
     let ops = school_ops();
-    let mut state:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarNeedsBattery, Condition::HaveMoney, Condition::HavePhoneBook];
+    //let mut state:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarNeedsBattery, Condition::HaveMoney, Condition::HavePhoneBook];
     //let mut problem1:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarWorks];
+    let mut state:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarNeedsBattery, Condition::ShopKnowsProblem, Condition::ShopHasMoney];
 
     let goal :Vec<Condition> = vec![Condition::SonAtSchool];
 
