@@ -1,11 +1,11 @@
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum Action {
     DriveSonToSchool, ShopInstallsBattery, TellShopProblem, TelephoneShop, LookUpNumber,
     AskPhoneNumber, GiveShopMoney
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum Condition {
     SonAtHome, SonAtSchool, CarWorks, ShopHasMoney, HaveMoney, InCommunicationWithShop, KnowPhoneNumber,
     CarNeedsBattery, ShopKnowsProblem, HavePhoneBook
@@ -18,6 +18,24 @@ struct Op {
     add_list :Vec<Condition>,
     del_list :Vec<Condition>
 }
+
+impl Clone for Op {
+    fn clone(&self) -> Self {
+        let mut op = Op {
+            action:self.action,
+            precond:vec![],
+            add_list:vec![],
+            del_list:vec![]
+        };
+
+        op.precond = self.precond.to_vec();
+        op.add_list = self.add_list.to_vec();
+        op.del_list = self.del_list.to_vec();
+
+        op
+    }
+}
+
 
 fn school_ops() -> Vec<Op> {
     let mut ops:Vec<Op> = vec![];
@@ -83,14 +101,14 @@ fn school_ops() -> Vec<Op> {
 }
 
 #[warn(dead_code)]
-fn appropriate(goal:&Condition, op:Op) -> bool {
+fn appropriate(goal:&Condition, op:&Op) -> bool {
     op.add_list.contains(&goal)
 }
 
 
 #[warn(unused_variables)]
-fn apply_op(mut _state:&Vec<Condition>, _goal:&Condition, _op:&Op) -> bool {
-    true
+fn apply_op(mut _state:&Vec<Condition>, _goal:&Condition, _op:& Op) -> bool {
+    false
 }
 
 #[warn(unused_variables)]
@@ -99,8 +117,18 @@ fn archive(mut state:&Vec<Condition>, goal:&Condition, ops:&Vec<Op>) -> bool {
         return true;
     }
     for op in ops {
-        if apply_op(&state, goal, op) {
-            return true;
+        // appropriateを使って、使えるOPを取り出す。
+       let mut appropriate_ops :Vec<Op> = vec![];
+        for op in ops {
+            if appropriate(goal, op) {
+                appropriate_ops.push(op.clone());
+            }
+        }
+
+        for op in appropriate_ops {
+            if apply_op(&state, goal, &op) {
+                return true;
+            }
         }
     }
     false
@@ -125,6 +153,7 @@ fn main() {
     let mut problem1:Vec<Condition> = vec![Condition::SonAtHome, Condition::CarWorks];
 
     let goal :Vec<Condition> = vec![Condition::SonAtSchool];
+
 
     let result = gps(problem1, goal, ops);
     println!("{:?}", result);
