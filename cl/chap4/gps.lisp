@@ -61,3 +61,7 @@
 (gps '(son-at-home car-needs-battery have-money have-phone-book)
      '(son-at-school)
      *school-ops*)
+
+(gps '(son-at-home car-needs-battery shop-has-money shop-knows-problem)
+     '(son-at-school)
+     *school-ops*)
